@@ -3,16 +3,16 @@
 namespace App\Models;
 
 use App\Entities\Address;
-use App\Entities\ParentStudent;
+use App\Entities\Teacher;
 use App\Models\Basic\AppModel;
 use CodeIgniter\Exceptions\PageNotFoundException;
 
-class ParentModel extends AppModel
+class TeacherModel extends AppModel
 {
-    protected $table            = 'parents';
+    protected $table            = 'teachers';
     protected $primaryKey       = 'id';
     protected $useAutoIncrement = true;
-    protected $returnType       = ParentStudent::class;
+    protected $returnType       = Teacher::class;
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
     protected $allowedFields    = [
@@ -34,7 +34,7 @@ class ParentModel extends AppModel
     protected $beforeInsert   = ['escapeData', 'setCode'];
     protected $beforeUpdate   = ['escapeData'];
 
-    public function store(ParentStudent $parent, Address $address): bool
+    public function store(Teacher $teacher, Address $address): bool
     {
 
         try {
@@ -42,9 +42,9 @@ class ParentModel extends AppModel
             $this->db->transException(true)->transStart();
 
             model(AddressModel::class)->save($address);
-            $parent->address_id = $address->id ?? model(AddressModel::class)->getInsertID();
+            $teacher->address_id = $address->id ?? model(AddressModel::class)->getInsertID();
 
-            $this->save($parent);
+            $this->save($teacher);
 
             // Finalizamos a transaction
             $this->db->transComplete();
@@ -58,29 +58,24 @@ class ParentModel extends AppModel
         }
     }
 
-    public function getByCode(
-        string $code,
-        bool $withAddress = false,
-        bool $withStudents = false,
-        bool $withSubscriptions = false,
-    ): ParentStudent {
+    public function getByCode(string $code, bool $withAddress = false): Teacher {
 
-        $parent = $this->where(['code' => $code])->first();
+        $teacher = $this->where(['code' => $code])->first();
 
-        if ($parent === null) {
+        if ($teacher === null) {
 
-            throw new PageNotFoundException("Responsável não encontrado. Code: {$code}");
+            throw new PageNotFoundException("Professor não encontrado. Code: {$code}");
         }
 
         if ($withAddress) {
 
-            $parent->address = model(AddressModel::class)->find($parent->address_id);
+            $teacher->address = model(AddressModel::class)->find($teacher->address_id);
         }
 
-        return $parent;
+        return $teacher;
     }
 
-    public function destroy(ParentStudent $parent): bool {
+    public function destroy(Teacher $parent): bool {
         
         try {
             // Iniciamos a transaction
@@ -97,7 +92,7 @@ class ParentModel extends AppModel
             return $this->db->transStatus();
         } catch (\Throwable $th) {
 
-            log_message('error', "Erro ao excluir o responsável: {$th->getMessage()}");
+            log_message('error', "Erro ao excluir o professor: {$th->getMessage()}");
             return false;
         }
     }

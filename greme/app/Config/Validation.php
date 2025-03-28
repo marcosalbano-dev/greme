@@ -4,6 +4,7 @@ namespace Config;
 
 use App\Validation\ParentValidation;
 use App\Validation\StudentValidation;
+use App\Validation\TeacherValidation;
 use CodeIgniter\Config\BaseConfig;
 use CodeIgniter\Validation\StrictRules\CreditCardRules;
 use CodeIgniter\Validation\StrictRules\FileRules;
@@ -29,6 +30,7 @@ class Validation extends BaseConfig
         CreditCardRules::class,
         ParentValidation::class, //Em razão do CPF validation
         StudentValidation::class,
+        TeacherValidation::class,
     ];
 
     /**
